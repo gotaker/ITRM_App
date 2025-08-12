@@ -1,0 +1,1 @@
+import React from 'react'; import { useAppSettings } from '../../state/useSettings'; export default function Home(){ const {settings}=useAppSettings(); return (<div className='section'><h1>Enterprise Risk</h1><p>Welcome.</p><a className='card' href={settings.github_repo_url || 'https://github.com/gotaker/ITRM_App'} target='_blank' rel='noreferrer'>View on GitHub</a></div>) }
