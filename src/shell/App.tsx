@@ -30,4 +30,3 @@ export default function App() {
     </div>
   )
 }
-import './App.css' // Assuming you have some styles for the app
