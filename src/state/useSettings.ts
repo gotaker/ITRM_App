@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { openDb, query, run } from '../db/sqlite'
+import { openDb, query, run } from '../../db/sqlite'
 import { sanitizeSettings } from './sanitize'
 
 type AppSettings = {

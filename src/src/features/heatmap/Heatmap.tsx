@@ -1,1 +1,0 @@
-import React from 'react'; import RiskTreatmentMatrix from '../../components/RiskTreatmentMatrix'; export default function Heatmap(){ return (<div className='section'><h2>Heatmap</h2><RiskTreatmentMatrix /></div>) }
