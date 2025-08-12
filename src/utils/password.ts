@@ -1,12 +1,4 @@
-export type PasswordCheck = {
-  length: boolean
-  upper: boolean
-  lower: boolean
-  number: boolean
-  special: boolean
-  noEmailLocal: boolean
-}
-
+export type PasswordCheck = { length: boolean; upper: boolean; lower: boolean; number: boolean; special: boolean; noEmailLocal: boolean }
 export function checkPassword(pw: string, email = ''): PasswordCheck {
   const local = (email.split('@')[0] || '').toLowerCase()
   return {
@@ -18,7 +10,8 @@ export function checkPassword(pw: string, email = ''): PasswordCheck {
     noEmailLocal: local ? !pw.toLowerCase().includes(local) : true,
   }
 }
-
-export function passwordOk(c: PasswordCheck) {
-  return c.length && c.upper && c.lower && c.number && c.special && c.noEmailLocal
+export function passwordOk(c: PasswordCheck) { return c.length && c.upper && c.lower && c.number && c.special && c.noEmailLocal }
+export function passwordStrength(pw: string): number {
+  const c = checkPassword(pw)
+  return Object.values(c).filter(v => v).length
 }
