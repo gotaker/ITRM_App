@@ -1,6 +1,6 @@
 import { sanitizeSettings } from './sanitize'
 
-it('clamps appetite anchors to [1,4] and bend to [-1,1]', () => {
+it('clamps anchors and bend', () => {
   const s = sanitizeSettings({ appetite_anchor_p: 9, appetite_anchor_i: -2, appetite_bend: 3 } as any)
   expect(s.appetite_anchor_p).toBe(4)
   expect(s.appetite_anchor_i).toBe(1)

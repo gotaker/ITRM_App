@@ -1,0 +1,14 @@
+FROM node:20-alpine
+WORKDIR /app
+
+# Install deps (use lockfile if present)
+COPY package*.json ./
+RUN if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install; fi
+
+# App source
+COPY . .
+
+# Vite dev server
+EXPOSE 5173
+ENV CHOKIDAR_USEPOLLING=true
+CMD ["npm","run","dev","--","--host","0.0.0.0","--port","5173"]

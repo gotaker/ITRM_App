@@ -33,8 +33,8 @@ export const useAppSettings = create<Store>((set, get) => ({
   settings: {},
   ready: false,
   load: async () => {
-    const db = await openDb()
-    const row = query<AppSettings>('SELECT * FROM app_settings WHERE id=1 LIMIT 1')[0]
+    await openDb()
+    const row = (await query<AppSettings>('SELECT * FROM app_settings WHERE id=1 LIMIT 1'))[0]
     set({ settings: sanitizeSettings(row ?? {} as any), ready: true })
   },
   save: async (patch) => {
@@ -48,5 +48,4 @@ export const useAppSettings = create<Store>((set, get) => ({
   }
 }))
 
-// Kick initial load
 openDb().then(() => useAppSettings.getState().load())

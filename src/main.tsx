@@ -3,15 +3,37 @@ import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import App from './shell/App'
 import Overview from './features/overview/Overview'
+import Risks from './features/risks/Risks'
+import Heatmap from './features/heatmap/Heatmap'
+import Reports from './features/reports/Reports'
 import ScoringSettings from './features/settings/Scoring'
+import Branding from './features/settings/Branding'
+import DataSettings from './features/settings/DataSettings'
+import ImportPage from './features/import/ImportPage'
+import SignIn from './features/auth/SignIn'
+import SignUp from './features/auth/SignUp'
+import VerifyEmail from './features/auth/VerifyEmail'
+import NotFound from './features/notfound/NotFound'
 import './styles/index.css'
 
 const router = createBrowserRouter([
   { path: '/', element: <App />, children: [
     { index: true, element: <Overview /> },
     { path: 'overview', element: <Overview /> },
+    { path: 'risks', element: <Risks /> },
+    { path: 'heatmap', element: <Heatmap /> },
+    { path: 'reports', element: <Reports /> },
     { path: 'settings/scoring', element: <ScoringSettings /> },
+    { path: 'settings/branding', element: <Branding /> },
+    { path: 'settings/data', element: <DataSettings /> },
+    { path: 'import', element: <ImportPage /> },
+    { path: '*', element: <NotFound /> },
   ]},
+  { path: '/auth', children: [
+    { path: 'sign-in', element: <SignIn /> },
+    { path: 'sign-up', element: <SignUp /> },
+    { path: 'verify', element: <VerifyEmail /> },
+  ]}
 ])
 
 createRoot(document.getElementById('root')!).render(<RouterProvider router={router} />)

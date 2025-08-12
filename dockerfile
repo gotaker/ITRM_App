@@ -2,7 +2,6 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-# Use ci if package-lock.json exists, else install
 RUN if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install; fi
 COPY . .
 RUN npm run build

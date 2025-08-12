@@ -13,6 +13,7 @@ export async function openDb() {
 const MIGRATIONS: string[] = [
 `BEGIN;
  PRAGMA user_version = 1;
+ -- Settings
  CREATE TABLE IF NOT EXISTS app_settings (
    id INTEGER PRIMARY KEY CHECK (id=1),
    hero_src_type TEXT NOT NULL DEFAULT 'url',
@@ -43,24 +44,115 @@ const MIGRATIONS: string[] = [
  'https://github.com/gotaker/ITRM_App',
  'See Overview page for details.'
  WHERE NOT EXISTS (SELECT 1 FROM app_settings WHERE id=1);
+
+ -- Users
+ CREATE TABLE IF NOT EXISTS users (
+   id TEXT PRIMARY KEY,
+   email TEXT UNIQUE NOT NULL,
+   name TEXT,
+   created_at TEXT DEFAULT CURRENT_TIMESTAMP
+ );
+
+ -- Projects
+ CREATE TABLE IF NOT EXISTS projects (
+   id TEXT PRIMARY KEY,
+   name TEXT NOT NULL,
+   code TEXT UNIQUE,
+   active INTEGER NOT NULL DEFAULT 1,
+   created_at TEXT DEFAULT CURRENT_TIMESTAMP
+ );
+
+ -- Risks
+ CREATE TABLE IF NOT EXISTS risks (
+   id TEXT PRIMARY KEY,
+   project_id TEXT,
+   title TEXT NOT NULL,
+   category TEXT,
+   status TEXT DEFAULT 'Open',
+   owner_id TEXT,
+   perspective TEXT DEFAULT 'Project',
+   created_at TEXT DEFAULT CURRENT_TIMESTAMP
+ );
+
+ -- Assessments
+ CREATE TABLE IF NOT EXISTS assessments (
+   id TEXT PRIMARY KEY,
+   risk_id TEXT NOT NULL,
+   phase TEXT NOT NULL CHECK(phase IN ('pre','post')),
+   probability INTEGER NOT NULL CHECK (probability BETWEEN 1 AND 4),
+   impact INTEGER NOT NULL CHECK (impact BETWEEN 1 AND 4),
+   assessed_by TEXT,
+   assessed_at TEXT DEFAULT CURRENT_TIMESTAMP
+ );
+
+ -- Mitigations
+ CREATE TABLE IF NOT EXISTS mitigations (
+   id TEXT PRIMARY KEY,
+   risk_id TEXT NOT NULL,
+   title TEXT NOT NULL,
+   owner TEXT,
+   due_date TEXT,
+   status TEXT DEFAULT 'Planned'
+ );
+
+ -- Reports
+ CREATE TABLE IF NOT EXISTS reports (
+   id TEXT PRIMARY KEY,
+   project_id TEXT NOT NULL,
+   kind TEXT NOT NULL,
+   period_start TEXT, period_end TEXT,
+   created_by TEXT NOT NULL,
+   href TEXT,
+   blob BLOB,
+   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+ );
+
+ -- Membership
+ CREATE TABLE IF NOT EXISTS project_members (
+   project_id TEXT NOT NULL,
+   user_id TEXT NOT NULL,
+   role TEXT NOT NULL CHECK(role IN ('Admin','ProjectManager','Owner','Viewer')),
+   PRIMARY KEY (project_id, user_id)
+ );
+
+ -- Stars
+ CREATE TABLE IF NOT EXISTS starred_projects (
+   user_id TEXT NOT NULL,
+   project_id TEXT NOT NULL,
+   PRIMARY KEY (user_id, project_id)
+ );
  COMMIT;`
 ]
 
 function migrate(db: any){
-  const cur = Number(db.exec('PRAGMA user_version;')[0]?.values?.[0]?.[0] ?? 0)
-  for (let v = cur; v < MIGRATIONS.length; v++){
-    db.exec(MIGRATIONS[v])
+  for (const sql of MIGRATIONS) db.exec(sql)
+  seed(db)
+}
+
+function seed(db: any){
+  const hasProject = db.exec('SELECT COUNT(*) c FROM projects')[0]?.values?.[0]?.[0] ?? 0
+  if (hasProject === 0){
+    const uid = 'u_demo'
+    db.exec(`INSERT INTO users (id, email, name) VALUES ('${uid}', 'demo@enterprise.local', 'Demo User');`)
+    db.exec(`INSERT INTO projects (id, name, code) VALUES ('p_demo', 'Demo Project', 'DEMO');`)
+    db.exec(`INSERT INTO project_members (project_id, user_id, role) VALUES ('p_demo','${uid}','ProjectManager');`)
+    db.exec("INSERT INTO risks (id, project_id, title, category, status, owner_id, perspective) VALUES ('r1','p_demo','Vendor may delay delivery','Schedule','Open','u_demo','Project');")
+    db.exec("INSERT INTO risks (id, project_id, title, category, status, owner_id, perspective) VALUES ('r2','p_demo','Security audit may slip','Security','Mitigating','u_demo','Project');")
+    db.exec("INSERT INTO risks (id, project_id, title, category, status, owner_id, perspective) VALUES ('r3',NULL,'Global supply chain disruption','External','Open','u_demo','Enterprise');")
+    db.exec("INSERT INTO assessments (id, risk_id, phase, probability, impact, assessed_by) VALUES ('a1','r1','pre',3,3,'u_demo');")
+    db.exec("INSERT INTO assessments (id, risk_id, phase, probability, impact, assessed_by) VALUES ('a2','r2','pre',2,4,'u_demo');")
+    db.exec("INSERT INTO assessments (id, risk_id, phase, probability, impact, assessed_by) VALUES ('a3','r3','pre',4,4,'u_demo');")
   }
 }
 
-export function query<T=any>(sql: string, params: any[]=[]): T[] {
+export function query<T=any>(sql: string, params: any[]=[]): Promise<T[]> {
   const db = _db
   const stmt = db.prepare(sql)
   try {
     stmt.bind(params)
     const rows: any[] = []
     while (stmt.step()) rows.push(stmt.getAsObject())
-    return rows as T[]
+    return Promise.resolve(rows as T[])
   } finally {
     stmt.free()
   }
