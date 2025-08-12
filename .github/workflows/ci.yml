@@ -1,20 +1,15 @@
 name: CI
-
 on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+  push: { branches: [ main, master ] }
+  pull_request: { branches: [ main, master ] }
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
@@ -34,40 +29,24 @@ jobs:
       - name: Coverage
         run: npm run coverage
 
-name: Run tests and upload coverage
-
-on: 
-  push
-
-jobs:
-  test:
-    name: Run tests and collect coverage
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
         with:
-          fetch-depth: 2
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npx jest --coverage
-
-      - name: Upload results to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ ac006047-ec23-4586-81ce-75a6a9a2ce21}}
-          slug: gotaker/ITRM_App
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage/lcov.info
           fail_ci_if_error: true
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+
+      - name: Build app
+        run: npm run build
+
+      - name: Start preview server
+        run: nohup npm run preview:test &
+
+      - name: Wait for server
+        run: npx wait-on http://127.0.0.1:4173
 
       - name: E2E tests
         run: npm run test:e2e
