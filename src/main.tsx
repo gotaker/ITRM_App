@@ -1,30 +1,29 @@
-import React, { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import App from './shell/App'
-import NotFound from './pages/NotFound'
-
-// Minimal router that nests existing routes inside App via <Outlet/>.
-// If you already register routes elsewhere, keep those — this is a safe fallback.
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <App/>,
-    errorElement: <NotFound/>,
-    children: [
-      { path: '*', element: <div style={{padding:16}}>App loaded. Replace with your routes.</div> }
-    ]
+(async function bootstrap(){
+  const boot = document.getElementById('boot')
+  function showErr(e){
+    const el = document.getElementById('root')
+    if(el){
+      el.innerHTML = '<div style="padding:16;color:#b91c1c"><h2>Boot error</h2><pre style="white-space:pre-wrap">'+String(e?.stack||e)+'</pre></div>'
+    } else {
+      console.error('[boot] error', e)
+    }
   }
-])
-
-const el = document.getElementById('root')
-if(!el){ throw new Error('Root element #root not found in index.html') }
-createRoot(el).render(
-  <StrictMode>
-    <ErrorBoundary><RouterProvider router={router}/></ErrorBoundary>
-  </StrictMode>
-)
-
-function ErrorBoundary({children}:{children:React.ReactNode}){
-  return <>{children}</>
-}
+  try{
+    const [{ StrictMode, createElement }, { createRoot }, { createBrowserRouter, RouterProvider }, AppMod] = await Promise.all([
+      import('react'),
+      import('react-dom/client'),
+      import('react-router-dom'),
+      import('./shell/App')
+    ])
+    const Home = () => createElement('div', {style:{padding:16}}, [
+      createElement('h1', {key:'h'}, 'Enterprise Risk — It works ✅'),
+      createElement('p', {key:'p'}, 'If this appears but your pages do not, wire your routes under <Outlet/> in shell/App.tsx.')
+    ])
+    const router = createBrowserRouter([{ path: '/', element: createElement(AppMod.default), children: [{ index: true, element: createElement(Home) }]}])
+    const rootEl = document.getElementById('root')
+    if(!rootEl) throw new Error('Root element #root not found')
+    if(boot) boot.remove()
+    createRoot(rootEl).render(createElement(StrictMode, {}, createElement(RouterProvider, { router })))
+    console.log('[white-screen-killer v3] React mounted ok')
+  }catch(e){ showErr(e) }
+})();

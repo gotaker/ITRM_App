@@ -1,0 +1,7 @@
+If your TS config lacks Vite/React JSX settings, ensure tsconfig.json contains:
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "types": ["vite/client"]
+  }
+}

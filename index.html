@@ -4,10 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Enterprise Risk</title>
+    <style>
+      html,body,#root{height:100%} body{margin:0;font-family:Inter,system-ui,Arial,sans-serif;background:#fff}
+      #boot{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#334155}
+      #boot .msg{padding:12px 16px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc}
+      #boot .err{color:#b91c1c;background:#fef2f2;border-color:#fecaca}
+    </style>
   </head>
   <body>
-    <div id="root"></div>
-    <script src="/debug-probe.js"></script>
+    <div id="root"><div id="boot"><div class="msg">Loading app…</div></div></div>
+    <script>
+      // If /src/main.tsx 404s, show it explicitly.
+      fetch('/src/main.tsx', {method:'HEAD'}).then(r=>{
+        if(!r.ok){
+          document.getElementById('boot').innerHTML = '<div class="msg err">/src/main.tsx returned '+r.status+'. Check Vite dev server paths/base.</div>';
+        }
+      }).catch(e=>{
+        document.getElementById('boot').innerHTML = '<div class="msg err">Network error fetching /src/main.tsx: '+String(e)+'</div>';
+      });
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

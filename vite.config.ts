@@ -1,13 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-
-// Detect GitHub Pages only once
-const isGitHubPages =
-  process.env.GITHUB_ACTIONS === 'true' &&
-  (process.env.GITHUB_REPOSITORY || '').endsWith('/ITRM_App')
-
+const onGh = process.env.GITHUB_PAGES === 'true' || process.env.VITE_GH_PAGES === 'true'
 export default defineConfig({
   plugins: [react()],
-  base: isGitHubPages ? '/ITRM_App/' : '/',
+  base: onGh ? '/ITRM_App/' : '/',
+  server: { host: true, port: 5173, strictPort: true, hmr: { clientPort: 5173 } },
+  preview: { port: 4173, strictPort: true }
 })
-// vite.config.ts
