@@ -1,11 +1,21 @@
 import React from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { openDb, query } from '../../db/sqlite'
+import Page from '../../components/Page'
+import DataTable from '../../components/md3/DataTable'
+import Button from '../../components/md3/Button'
+import TextField from '../../components/md3/TextField'
+
+type Row = {
+  id:string; code?:string; title:string; category?:string; status?:string; owner?:string; mitigation_cost?:number|string;
+  pre_p?:number; pre_i?:number; post_p?:number; post_i?:number
+}
 
 export default function Risks(){
   const [params] = useSearchParams(); const nav=useNavigate()
   const pf=Number(params.get('p')||0), ip=Number(params.get('i')||0)
-  const [rows,setRows] = React.useState<any[]>([])
+  const [rows,setRows] = React.useState<Row[]>([])
+  const [q,setQ] = React.useState('')
 
   React.useEffect(()=>{ (async()=>{
     await openDb()
@@ -22,41 +32,29 @@ export default function Risks(){
       LEFT JOIN assessments a ON a.risk_id=r.id AND a.phase='pre'
       WHERE ${where}
       ORDER BY COALESCE(pre.probability,0)*COALESCE(pre.impact,0) DESC, r.created_at DESC`
-    setRows(query(sql,bind))
+    setRows(query<Row>(sql,bind))
   })() },[pf,ip])
 
   const score=(p?:number,i?:number)=> (p||0)*(i||0) || ''
+  const filtered = rows.filter(r=>{
+    if(!q) return true
+    const hay = `${r.title} ${r.category||''} ${r.code||''} ${r.owner||''}`.toLowerCase()
+    return hay.includes(q.toLowerCase())
+  }).map(r=>({...r, pre_score:score(r.pre_p,r.pre_i), post_score:score(r.post_p,r.post_i)}))
 
-  return (<div className="section">
-    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-      <h2>Risks {pf||ip ? '(filtered)' : ''}</h2>
-      <button className="card" onClick={()=>nav('/assess')}>+ Guided assessment</button>
+  return (<Page title={`Risks ${pf||ip ? '(filtered)' : ''}`} actions={<Button onClick={()=>nav('/assess')}>+ Guided assessment</Button>}>
+    <div className="md3-card"><TextField label="Search" placeholder="Title, category, code, owner…" value={q} onChange={e=>setQ((e.target as HTMLInputElement).value)} /></div>
+    <div className="md3-card">
+      <DataTable<Row> columns={[
+        {key:'code', title:'Code', width:'10%'},
+        {key:'title', title:'Title', width:'28%'},
+        {key:'category', title:'Category', width:'16%'},
+        {key:'status', title:'Status', width:'10%'},
+        {key:'owner', title:'Owner', width:'12%'},
+        {key:'mitigation_cost', title:'Mitigation cost', width:'10%'},
+        {key:'pre_p', title:'Pre P'},{key:'pre_i', title:'Pre I'},{key:'pre_score', title:'Pre Score'},
+        {key:'post_p', title:'Post P'},{key:'post_i', title:'Post I'},{key:'post_score', title:'Post Score'}
+      ]} rows={filtered}/>
     </div>
-    <div className="helper" style={{marginBottom:8}}>Tip: filters P={pf||'–'} I={ip||'–'} come from clicking Heatmap cells.</div>
-    <table width="100%" cellPadding={8}>
-      <thead>
-        <tr>
-          <th>Code</th><th>Title</th><th>Category</th><th>Status</th><th>Owner</th><th>Mitigation cost</th>
-          <th>Pre P</th><th>Pre I</th><th>Pre Score</th>
-          <th>Post P</th><th>Post I</th><th>Post Score</th>
-        </tr>
-      </thead>
-      <tbody>
-        {rows.map(r=>(<tr key={r.id}>
-          <td>{r.code||''}</td>
-          <td>{r.title}</td>
-          <td>{r.category}</td>
-          <td>{r.status}</td>
-          <td>{r.owner||''}</td>
-          <td>{r.mitigation_cost ?? ''}</td>
-          <td>{r.pre_p ?? ''}</td>
-          <td>{r.pre_i ?? ''}</td>
-          <td>{score(r.pre_p,r.pre_i)}</td>
-          <td>{r.post_p ?? ''}</td>
-          <td>{r.post_i ?? ''}</td>
-          <td>{score(r.post_p,r.post_i)}</td>
-        </tr>))}
-      </tbody>
-    </table>
-  </div>)
+  </Page>)
 }

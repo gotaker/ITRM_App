@@ -1,32 +1,21 @@
 import React from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { useAuth } from '../state/useAuth'
+import { Outlet, Link } from 'react-router-dom'
+import MD3Theme from '../components/md3/Theme'
 
-export default function App() {
-  const nav = useNavigate(), { user, signOut } = useAuth()
-  return (
-    <div>
-      <div className="topbar">
-        <div className="brand"><div className="logo" /> Enterprise Risk</div>
-        <div className="nav" style={{ display:'flex', alignItems:'center', gap:8 }}>
-          <NavLink to="/">Home</NavLink>
-          <NavLink to="/overview">Overview</NavLink>
-          <NavLink to="/risks">Risks</NavLink>
-          <NavLink to="/heatmap">Heatmap</NavLink>
-          <NavLink to="/reports">Reports</NavLink>
-          <NavLink to="/settings/scoring">Settings</NavLink>
-          <span style={{ marginLeft: 12 }}>|</span>
-          {user ? (
-            <>
-              <span className="helper">Hi, {user.name || user.email}</span>
-              <button className="card" onClick={() => { signOut(); nav('/auth/sign-in') }}>Sign out</button>
-            </>
-          ) : (
-            <button className="card" onClick={() => nav('/auth/sign-in')}>Sign in</button>
-          )}
-        </div>
-      </div>
-      <div className="container"><Outlet /></div>
+export default function App(){
+  return (<MD3Theme>
+    <div style={{display:'grid', gap:12, padding:16}}>
+      <header style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+        <Link to="/" style={{textDecoration:'none', color:'#0f172a', fontWeight:800}}>Enterprise Risk</Link>
+        <nav style={{display:'flex', gap:12}}>
+          <Link to="/overview">Overview</Link>
+          <Link to="/heatmap">Heatmap</Link>
+          <Link to="/risks">Risks</Link>
+          <Link to="/reports">Reports</Link>
+          <Link to="/settings/scoring">Settings</Link>
+        </nav>
+      </header>
+      <Outlet/>
     </div>
-  )
+  </MD3Theme>)
 }

@@ -1,4 +1,7 @@
 import React from 'react'
+import Page from '../../components/Page'
+import Button from '../../components/md3/Button'
+import TextArea from '../../components/md3/TextArea'
 import { openDb, query, run } from '../../db/sqlite'
 
 export default function DataSettings(){
@@ -24,14 +27,14 @@ export default function DataSettings(){
     }
     alert('Import done')
   }
-  return (<div className="section"><h2>Settings — Data</h2>
-    <div className="card">
-      <button className="card" onClick={doExport}>Export (JSON)</button>
-      {exportJson && <textarea rows={14} style={{width:'100%'}} value={exportJson} readOnly/>}
+  return (<Page title="Settings — Data">
+    <div className="md3-card">
+      <Button variant="tonal" onClick={doExport}>Export (JSON)</Button>
+      {exportJson && <div style={{marginTop:10}}><TextArea label="Export" value={exportJson} readOnly/></div>}
     </div>
-    <div className="card">
-      <label>Import JSON <input type="file" accept="application/json" onChange={doImport}/></label>
-      <div className="helper">This imports JSON created by the Export above.</div>
+    <div className="md3-card">
+      <input type="file" accept="application/json" onChange={doImport}/>
+      <div className="md3-helper">This imports JSON created by the Export above.</div>
     </div>
-  </div>)
+  </Page>)
 }
