@@ -1,0 +1,12 @@
+PATCH_NOTES.md
+src/db/sqlite.ts
+src/features/assess/Wizard.tsx
+src/features/heatmap/Heatmap.tsx
+src/features/import/ImportPage.tsx
+src/features/risks/Risks.tsx
+src/features/settings/Branding.tsx
+src/features/settings/DataSettings.tsx
+src/features/settings/Scoring.tsx
+src/main.tsx
+src/pages/Reports.tsx
+src/state/useSettings.ts
