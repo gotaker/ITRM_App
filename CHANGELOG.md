@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Shell header & navigation** linking Overview / Heatmap / Risks / Reports / Settings.
 
 ### Changed
-- Replaced any references to “Ericsson” with **“enterprise”** in copy and labels.
+- Replaced any references to “GHG” with **“enterprise”** in copy and labels.
 - Unified spacing, elevation, and focus rings to MD3 tokens; converted plain HTML tables/inputs to MD3 components.
 - Simplified header to a clean, fluid layout that scales from mobile to desktop.
 
