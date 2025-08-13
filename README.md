@@ -1,9 +1,12 @@
+
+>undercosntruction
+
 # Enterprise Risk (ITRM)
 
 A lightweight, Material Design 3–styled web app for project managers to **capture, assess, monitor, and report project risks**.  
 Runs fully client-side with **React + Vite + SQLite (WASM/OPFS)** and secures access via **OIDC SSO** (Azure AD / Google).
 
-> All legacy references were generalized to **enterprise**.
+
 
 ---
 
