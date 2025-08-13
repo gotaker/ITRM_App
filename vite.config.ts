@@ -1,9 +1,14 @@
+// vite.config.ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-const onGh = process.env.GITHUB_PAGES === 'true' || process.env.VITE_GH_PAGES === 'true'
+
+// Locally: leave VITE_BASE unset (defaults to '/')
+// GH Pages: set VITE_BASE=/ITRM_App/
+const base = process.env.VITE_BASE || '/'
+
 export default defineConfig({
   plugins: [react()],
-  base: onGh ? '/ITRM_App/' : '/',
+  base,
   server: { host: true, port: 5173, strictPort: true, hmr: { clientPort: 5173 } },
-  preview: { port: 4173, strictPort: true }
+  preview: { host: true, port: 5173, strictPort: true }
 })
