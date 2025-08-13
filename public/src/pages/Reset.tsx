@@ -1,0 +1,1 @@
+export default function Reset(){ return (<div className='section' style={{maxWidth:480,margin:'40px auto'}}><h2>Password reset</h2><p className='helper'>Use your OIDC provider’s password reset flow. If you add a custom backend, wire this page to validate a reset token.</p></div>) }

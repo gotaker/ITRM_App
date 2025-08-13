@@ -1,0 +1,17 @@
+{
+  "providers": {
+    "azure": {
+      "authority": "https://login.microsoftonline.com/<tenant-id>/v2.0",
+      "client_id": "<entra-client-id>",
+      "redirect_uri": "http://localhost:5173/auth/callback",
+      "scope": "openid profile email"
+    },
+    "google": {
+      "authority": "https://accounts.google.com",
+      "client_id": "<google-client-id>",
+      "redirect_uri": "http://localhost:5173/auth/callback",
+      "scope": "openid profile email"
+    }
+  },
+  "default": "azure"
+}
